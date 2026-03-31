@@ -4,7 +4,7 @@ from .forms import ProjetForm
 from article.models import Article
 from calorifu.models import Calorifu
 from django.db.models.functions import Coalesce
-from django.db.models import Sum, F, Value, DecimalField, IntegerField, Q
+from django.db.models import Sum, F, Value, DecimalField, IntegerField, Q, FloatField
 
 # Liste des projets
 def list(request):
@@ -12,40 +12,55 @@ def list(request):
     return render(request,'projet/list.html',{'projets':projets})
 
 
-def show(request,pk):
-    projet=get_object_or_404(Projet,pk=pk)
+from collections import defaultdict
 
-    articles_groupes = (
-        Article.objects
-        .filter(systemes_lies__projet=projet)
-        .values('nom')  # group by nom
-        .annotate(
-            total_qte=Sum('qte'),
-            total_montant=Sum(F('prix') * F('qte'))
-        )
-    )
+def show(request, pk):
+    projet = get_object_or_404(Projet, pk=pk)
 
-    calorifus = Article.objects.filter(
-        systemes_lies__projet=projet.pk,
-        calorifus__tuy__gt=0  # <-- filtre ici
-    ).distinct().annotate(
-        total_tuy=Coalesce(
-            Sum('calorifus__tuy'),
-            Value(0),
-            output_field=DecimalField(max_digits=10, decimal_places=2)
-        ),
-        total_tuy_cds=Coalesce(Sum('calorifus__tuy_cds'), Value(0), output_field=IntegerField()),
-        total_tuy_emb=Coalesce(Sum('calorifus__tuy_emb'), Value(0), output_field=IntegerField()),
-        total_tuy_rob=Coalesce(Sum('calorifus__tuy_rob'), Value(0), output_field=IntegerField()),
-    )
+    systemes_data = []
+    total_projet = 0
 
-    return render(request, "projet/show.html", {
-        "projet": projet,
-        "articles_groupes": articles_groupes,
-        "calorifus": calorifus,
+    # 🔹 Pour le tableau global
+    articles_groupes = defaultdict(lambda: {
+        'nom': '',
+        'unite': '',
+        'prix': 0,
+        'qte_totale': 0,
+        'montant_total': 0
     })
 
+    for systeme in projet.systemes.all():
+        articles = systeme.articles_systeme
+        total_systeme = 0
 
+        for article in articles:
+            montant = article.montant
+            total_systeme += montant
+            total_projet += montant
+
+            eq = article.equipement
+
+            # 🔹 Regroupement
+            articles_groupes[eq.id]['nom'] = eq.nom
+            articles_groupes[eq.id]['unite'] = eq.unite
+            articles_groupes[eq.id]['prix'] = eq.prix
+            articles_groupes[eq.id]['qte_totale'] += article.qte
+            articles_groupes[eq.id]['montant_total'] += montant
+
+        systemes_data.append({
+            'systeme': systeme,
+            'articles': articles,
+            'total': total_systeme
+        })
+
+    context = {
+        'projet': projet,
+        'systemes_data': systemes_data,
+        'total_projet': total_projet,
+        'articles_groupes': articles_groupes.values(),  # 👈 important
+    }
+
+    return render(request, 'projet/show.html', context)
 # Ajouter un projet
 def new(request):
     if request.method == 'POST':

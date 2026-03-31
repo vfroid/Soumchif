@@ -1,86 +1,85 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h3> Projet : {{ projet.description }} </h3>
-    <p> Mandant: {{ projet.mandant }}</p>
+<h1>Projet : {{ projet.mandant }} débuté le  {{ projet.debut }}</h1>
+<h2>Récapitulatif global des articles</h2>
+{% for item in systemes_data %}
+  <h3>Système : {{ item.systeme.nom }} ( {{ item.systeme.code }}  {{ item.systeme.local}})</h3>
 
-    <h3> Regroupement par systèmes</h3>
-    <table>
-        <tr>
-            <th>Système</th>
-            <th>Abréviation</th>
-            <th>Bâtiment</th>
-            <th>Local</th>
-            <th>Montant</th>
-            <th>Actions</th>
-        </tr>
+  <table class="table-systeme">
+    <thead>
+      <tr>
+        <th class="col-nom">Article</th>
+        <th class="col-qte">Quantité</th>
+        <th class="col-unite">Unité</th>
+        <th class="col-prix">Prix unitaire</th>
+        <th class="col-total">Montant</th>
+      </tr>
+    </thead>
 
-        {% for s in projet.systemes.all %}
-            <tr>
-                <td>{{ s.nom }}</td>
-                <td>{{ s.abreviation }}</td>
-                <td>{{ s.local.etage.batiment }}</td>
-                <td>{{ s.local }}</td>
-                <td>{{ s.montant_total_articles | floatformat:2 }}</td>
-                <td><a href="{% url 'systeme_show' s.pk %}">Show</a></td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">Aucun système trouvé</td>
-            </tr>
-        {% endfor %}
+    <tbody>
+      {% for article in item.articles %}
+      <tr>
+        <td class="col-nom">{{ article.equipement.nom }}</td>
+        <td class="col-qte">{{ article.qte }}</td>
+        <td class="col-unite">{{ article.equipement.unite }}</td>
+        <td class="col-prix">{{ article.equipement.prix|floatformat:2 }}</td>
+        <td class="col-total">{{ article.montant|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
 
-    <!-- ✅ Ligne total -->
-        <tr>
-            <td></td><td></td><td></td>
-            <td><strong>Total</strong></td>
-            <td><strong>{{ projet.montant_total|floatformat:2 }} CHF</strong></td>
-        </tr>
-    </table>
+    <tfoot>
+      <tr>
+        <td colspan="4" class="total-ligne">Total système :</td>
+        <td class="col-total">{{ item.total|floatformat:2 }}</td>
+      </tr>
+    </tfoot>
+      <table class="table-systeme">
+          <tr>
+            <td class="col-nom"></td>
+            <td class="col-qte"></td>
+            <td class="col-unite"></td>
+            <td class="total-ligne">TOTAL PROJET :</td>
+            <td class="col-total"><strong>{{ total_projet|floatformat:2 }}</strong></td>
+          </tr>
+        </table>
+  </table>
+{% endfor %}
 
-   <h3> Regroupement par articles</h3>
-    <table>
-        <tr>
-            <th>Article</th>
-            <th>Quantité</th>
-            <th>Montant</th>
-        </tr>
+<hr>
 
-        {% for a in articles_groupes %}
-            <tr>
-                <td>{{ a.nom }}</td>
-                <td>{{ a.total_qte }}</td>
-                <td>{{ a.total_montant|floatformat:2 }} CHF</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">Aucun article</td>
-            </tr>
-        {% endfor %}
-    </table>
+<h2>Récapitulatif global des articles</h2>
 
-    <h3>Calorifugeages</h3>
-    <table>
-        <tr>
-            <th>Article</th>
-            <th>Longueur (m)</th>
-            <th>Tuy_CDS</th>
-            <th>Tuy_Emb</th>
-            <th>Tuy_Rob</th>
-        </tr>
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Article</th>
+      <th>Quantité totale</th>
+      <th>Unité</th>
+      <th>Prix unitaire</th>
+      <th>Montant total</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for article in articles_groupes %}
+    <tr>
+      <td>{{ article.nom }}</td>
+      <td>{{ article.qte_totale }}</td>
+      <td>{{ article.unite }}</td>
+      <td>{{ article.prix|floatformat:2 }}</td>
+      <td class="total-ligne"><strong>{{ article.montant_total|floatformat:2 }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+    <table class="table-systeme">
+          <tr>
+            <td class="col-nom"></td>
+            <td class="col-qte"></td>
+            <td class="col-unite"></td>
+            <td class="total-ligne">TOTAL PROJET :</td>
+            <td class="col-total"><strong>{{ total_projet|floatformat:2 }}</strong></td>
+          </tr>
+        </table>
 
-        {% for c in calorifus %}
-            <tr>
-                <td>{{ c.nom }}</td>
-                <td>{{ c.total_tuy| floatformat:2 }}</td>
-                <td>{{ c.total_tuy_cds  }}</td>
-                <td>{{ c.total_tuy_emb  }}</td>
-                <td>{{ c.total_tuy_rob }}</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">Aucun calorifugeage</td>
-            </tr>
-        {% endfor %}
-    </table>
 {% endblock content %}

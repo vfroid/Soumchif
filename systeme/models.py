@@ -71,8 +71,8 @@ class Systeme(models.Model):
 
     @property
     def articles_systeme(self):
-        """Articles liés au système avec qte > 0"""
-        return self.articles.filter(qte__gt=0)
+        """Articles liés au système via ForeignKey avec qte > 0"""
+        return self.systeme_articles.filter(qte__gt=0)
 
     def get_articles_proposes(self):
         """Retourne les articles proposés par le SystemeType si le système est vide"""

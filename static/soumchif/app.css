@@ -164,3 +164,40 @@ ul li a {
 ul li a:hover {
     background-color: #ecf0f1;
 }
+
+<style>
+.table-systeme {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    table-layout: fixed; /* 🔥 force mêmes largeurs */
+}
+
+.table-systeme th,
+.table-systeme td {
+    border: 1px solid #ccc;
+    padding: 6px;
+}
+
+.table-systeme th {
+    background-color: #f5f5f5;
+}
+
+/* Largeurs fixes identiques pour toutes les tables */
+.col-nom   { width: 30%; }
+.col-qte   { width: 15%; text-align: right; }
+.col-unite { width: 15%; }
+.col-prix  { width: 20%; text-align: right; }
+.col-total { width: 20%; text-align: right; }
+
+/* Totaux alignés */
+.total-ligne {
+    text-align: right;
+    font-weight: bold;
+}
+
+.total-projet {
+    text-align: right;
+    font-size: 18px;
+    margin-top: 20px;
+}
