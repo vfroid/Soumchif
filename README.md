@@ -1,6 +1,7 @@
 # Installation et configuration du projet Django
 
 Ce guide explique comment initialiser et configurer le projet Django `Soumchif`.
+Il permet l'établissement de données pour une soumission, mais reste très sommaire !
 
 
 ## Initialisation du projet
