@@ -34,7 +34,15 @@ python manage.py createsuperuser
 ```
 ## Remplissage de la base de données
 Les données peuvent être insérées en base de données via le fichier Remplissage_BDD.odt.
+Pour les bâtiments, importer les données de locauxminimum.csv dans la table batiment_local via le prompt de sqlite3 ouvert via 
 
+puis
+
+```bash
+python manage.py dbshell
+.separator ','
+.import locauxminmum.csv batiment_local
+```
 ## Lancer le serveur local
 ```bash
 python manage.py runserver
