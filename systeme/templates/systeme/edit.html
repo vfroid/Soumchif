@@ -34,22 +34,32 @@
                 <th>Quantité</th>
                 <th>Prix</th>
                 <th>Unité</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for f in articles_existants_forms %}
+             {% for art in articles_existants %}
             <tr>
-                <td>{{ f.nom }}</td>
-                <td>{{ f.groupe }}</td>
-                <td>{{ f.sous_groupe }}</td>
-                <td>{{ f.qte }}</td>
-                <td>{{ f.prix }}</td>
-                <td>{{ f.unite }}</td>
-                {{ f.equipement_id }}
+                <td style="color: darkblue;">{{ art.equipement.nom }}</td>
+                <td style="color: darkblue;">{{ art.equipement.groupe.nom }}</td>
+                <td style="color: darkblue;">{{ art.equipement.sous_groupe.nom }}</td>
+                <td style="color: darkblue;">
+                    <input type="number" name="qte-{{ art.id }}" value="{{ art.qte }}" step="1.0" class="form-control" />
+                </td>
+                <td style="color: darkblue;">{{ art.equipement.prix }}</td>
+                <td style="color: darkblue;">{{ art.equipement.unite }}</td>
+                <td>
+                    <a href="{% url 'article_delete' art.id %}"
+                       onclick="return confirm('Supprimer cet article ?');"
+                       style="color: red;">
+                       Supprimer
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
 
     <!-- Nouveaux équipements à ajouter -->
     <h3>Nouveaux équipements</h3>
@@ -68,13 +78,13 @@
         <tbody>
             {% for f in articles_nouveaux_forms %}
             <tr>
-                <td>{{ f.ajouter }}</td>
-                <td>{{ f.nom }}</td>
-                <td>{{ f.groupe }}</td>
-                <td>{{ f.sous_groupe }}</td>
-                <td>{{ f.qte }}</td>
-                <td>{{ f.prix }}</td>
-                <td>{{ f.unite }}</td>
+                <td style="color: darkgreen";>{{ f.ajouter }}</td>
+                <td style="color: darkgreen";>{{ f.nom.value }}</td>
+                <td style="color: darkgreen";>{{ f.groupe.value }}</td>
+                <td style="color: darkgreen";>{{ f.sous_groupe.value }}</td>
+                <td style="color: darkblue";>{{ f.qte }}</td>
+                <td style="color: darkgreen";>{{ f.prix.value }}</td>
+                <td style="color: darkgreen";>{{ f.unite.value }}</td>
                 {{ f.equipement_id }}
             </tr>
             {% endfor %}

@@ -6,36 +6,39 @@
     <h3>Menu Article</h3>
     <ul>
         <li><a href="{% url 'home' %}">Accueil</a></li>
-        <li><a href="{% url 'article_new' %}">Nouvel article</a></li>
     </ul>
 
 {% endblock sidebar %}
 
 {% block content  %}
     <h1>Articles :</h1>
+
+    <p> Ces articles sont modifiables via les systèmes qui leur correspondent.</p>
         <table>
             <tr>
-                <th style="text-align: left;">Nom</th>
-                <th style="text-align: left;">Groupe</th>
-                <th style="text-align: left;">Sous-groupe</th>
-                <th style="text-align: left;">Prix</th>
-                <th style="text-align: left;">Unité</th>
-                <th style="text-align: left;">Quantité</th>
-                <th style="text-align: left;">Actions</th> <!-- Nouvelle colonne -->
+                <th>Systeme associé</th>
+                <th>Nom</th>
+                <th>Groupe</th>
+                <th>Sous-groupe</th>
+                <th>Prix</th>
+                <th>Unité</th>
+                <th>Quantité</th>
+               {# <th>Actions</th>  #}
             </tr>
             {% for a in articles %}
             <tr>
-                <td>{{ a.nom }}</td>
-                <td>{{ a.groupe }}</td>
-                <td>{{ a.sous_groupe }}</td>
-                <td>{{ a.prix }}</td>
-                <td>{{ a.unite }}</td>
+                <td>{{ a.systeme.nom}} du projet {{a.systeme.projet }}/td>
+                <td>{{ a.equipement.nom }}</td>
+                <td>{{ a.equipement.groupe }}</td>
+                <td>{{ a.equipement.sous_groupe }}</td>
+                <td>{{ a.equipement.prix }}</td>
+                <td>{{ a.equipement.unite }}</td>
                 <td>{{ a.qte }}</td>
-                <td>
-                    <a href="{% url 'article_show' a.pk %}">Show</a> |
-                    <a href="{% url 'article_edit' a.pk %}">Edit</a>
-                    <a href="{% url 'article_delete' a.pk %}">Delete</a>
-                </td>
+               {#  <td> #}
+                     {# <a href="{% url 'article_show' a.pk %}">Show</a> | #}
+                   {#  <a href="{% url 'article_edit' a.pk %}">Edit</a> #}
+                   {# <a href="{% url 'article_delete' a.pk %}">Delete</a> #}
+                {#  </td> #}
             </tr>
             {% endfor %}
         </table>

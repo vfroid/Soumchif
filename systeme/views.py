@@ -9,6 +9,7 @@ from django.forms import modelformset_factory
 
 from .forms import (
     SystemeForm,
+    ArticleShowForm,
     ArticleAjoutForm,
     ArticleEditForm,
     ArticleSystemeFormSet,
@@ -40,7 +41,10 @@ def get_equipements(request):
 
     return JsonResponse({'equipements': data})
 
-
+def supprimer_article(request, article_id):
+    article = get_object_or_404(SystemeArticle, id=article_id)
+    article.delete()
+    return redirect('show')  # remplace 'show' par le nom de ta vue
 
 
 #******************************************** CRUD *************************************************/
@@ -57,9 +61,33 @@ def show(request, pk):
     # total (optionnel mais utile)
     total = sum(a.montant for a in articles)
 
+    # 🔹 ARTICLES EXISTANTS
+    articles_existants = Article.objects.filter(systeme=systeme)
+    articles_existants_forms = []
+
+    # Construire un formulaire pour chaque article existant
+    for i, art in enumerate(articles_existants):
+        articles_existants_forms.append(
+            ArticleAjoutForm(
+                request.POST if request.method == 'POST' else None,
+                prefix=f'exist-{i}',
+                initial={
+                    'equipement_id': art.equipement.id,
+                    'nom': art.equipement.nom,
+                    'groupe': art.equipement.groupe.nom,
+                    'sous_groupe': art.equipement.sous_groupe.nom,
+                    'unite': art.equipement.unite,
+                    'prix': art.equipement.prix,
+                    'qte': art.qte,
+                    'ajouter': True,
+                }
+            )
+        )
+
     return render(request, "systeme/show.html", {
         "systeme": systeme,
         "articles": articles,
+        'articles_existants_forms': articles_existants_forms,
         "total":total,
     })
 
@@ -103,26 +131,8 @@ def edit(request, pk):
 
     # 🔹 ARTICLES EXISTANTS
     articles_existants = Article.objects.filter(systeme=systeme)
-    articles_existants_forms = []
 
-    # Construire un formulaire pour chaque article existant
-    for i, art in enumerate(articles_existants):
-        articles_existants_forms.append(
-            ArticleAjoutForm(
-                request.POST if request.method == 'POST' else None,
-                prefix=f'exist-{i}',
-                initial={
-                    'equipement_id': art.equipement.id,
-                    'nom': art.equipement.nom,
-                    'groupe': art.equipement.groupe.nom,
-                    'sous_groupe': art.equipement.sous_groupe.nom,
-                    'unite': art.equipement.unite,
-                    'prix': art.equipement.prix,
-                    'qte': art.qte,
-                    'ajouter': True,
-                }
-            )
-        )
+
 
     # 🔹 NOUVEAUX EQUIPEMENTS
     equipements_nouveaux = systeme.type.equipements_lies.exclude(
@@ -152,13 +162,13 @@ def edit(request, pk):
         systeme = form.save()
 
         # Articles existants : mise à jour des qte
-        for f in articles_existants_forms:
-            if f.is_valid():
-                equipement_id = f.cleaned_data['equipement_id']
-                qte = f.cleaned_data.get('qte') or 0
-                article = Article.objects.get(systeme=systeme, equipement_id=equipement_id)
-                article.qte = qte
-                article.save()
+        # 🔹 Parcours tous les articles existants
+        for art in articles_existants:
+            # Récupérer la nouvelle valeur de qte envoyée depuis le formulaire
+            qte_new = request.POST.get(f'qte-{art.id}')
+            if qte_new is not None:
+                art.qte = float(qte_new)  # convertir en float
+                art.save()  # enregistrer dans la base
 
         # Nouveaux articles : création si checkbox cochée
         for f in articles_nouveaux_forms:
@@ -173,7 +183,8 @@ def edit(request, pk):
 
     return render(request, 'systeme/edit.html', {
         'form': form,
-        'articles_existants_forms': articles_existants_forms,
+        'articles_existants': articles_existants,
+        #'articles_existants_forms': articles_existants_forms,
         'articles_nouveaux_forms': articles_nouveaux_forms,
         'systeme': systeme,
     })

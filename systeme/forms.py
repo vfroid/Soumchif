@@ -24,6 +24,16 @@ class SystemeForm(forms.ModelForm):
         self.fields['local'].queryset = Local.objects.all()
         self.fields['projet'].queryset = Projet.objects.all()
 
+# Formulaire pour voir un article les articles d'un équipement
+class ArticleShowForm(forms.Form):
+    equipement_id = forms.IntegerField(widget=forms.HiddenInput)
+    nom = forms.CharField(disabled=True)
+    groupe = forms.CharField(disabled=True)
+    sous_groupe = forms.CharField(disabled=True)
+    unite = forms.CharField(disabled=True)
+    prix = forms.DecimalField(disabled=True)
+    qte = forms.DecimalField(disabled=True)
+
 
 # Formulaire pour ajouter un article depuis un équipement
 class ArticleAjoutForm(forms.Form):
@@ -42,12 +52,14 @@ class ArticleAjoutForm(forms.Form):
 
 # pour modifier des articles
 class ArticleEditForm(forms.ModelForm):
+    article_id = forms.IntegerField(widget=forms.HiddenInput())
     class Meta:
         model = Article
-        fields = ['qte']
+        fields = ['qte']  # seul champ modifiable
         widgets = {
             'qte': forms.NumberInput(attrs={'class': 'form-control', 'step': '1.0'})
         }
+
 
 
 ArticleSystemeFormSet = modelformset_factory(
