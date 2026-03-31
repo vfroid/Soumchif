@@ -3,22 +3,17 @@ from django.conf import settings
 from django.db import models
 
 from systeme.models  import Systeme,SystemeType
+from equipement.models import Equipement
 
 
 class Article(models.Model):
-    nom = models.CharField(max_length=100)
-    groupe = models.CharField(max_length=50)
-    sous_groupe = models.CharField(max_length=50)
-    prix = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    unite = models.CharField(max_length=20)
-    qte = models.PositiveIntegerField(default=0)
+    systeme=models.ForeignKey(Systeme,on_delete=models.CASCADE, related_name='systeme_articles')
+    equipement = models.ForeignKey(Equipement,on_delete=models.CASCADE, related_name='equipement_articles')
+    qte = models.DecimalField(max_digits=10, decimal_places=2, default=0) # decimal pour mètres (m)
 
     @property
     def montant(self):
-        try:
-            return float(self.prix) * int(self.qte)
-        except:
-            return 0
+        return float(self.equipement.prix) * float(self.qte or 0)
 
     def __str__(self):
-        return f"{self.nom} ({self.qte} {self.unite})"
+        return f"{self.equipement.nom} ({self.qte} {self.equipement.unite})"

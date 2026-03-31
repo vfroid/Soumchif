@@ -23,15 +23,14 @@ class SystemeType(models.Model):
     )
 
     # Articles liés
-    articles_lies = models.ManyToManyField(
-        'article.Article',  # référence par string pour éviter circular import
+    equipements_lies = models.ManyToManyField(
+        'equipement.Equipement',  # référence par string pour éviter circular import
         related_name='systeme_types',
         blank=True
     )
 
     def __str__(self):
         return f"{self.nom} ({self.abreviation or ''}) - {self.get_prodouemis_display()}"
-
 
 
 

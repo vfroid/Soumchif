@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block sidebar %}
+    <h3>Menu Equipement </h3>
+    <ul>
+        <li><a href="{% url 'home' %}">Accueil</a></li>
+        <li><a href="{% url 'equipement_new' %}">Nouvel équipement</a></li>
+    </ul>
+
+{% endblock sidebar %}
+
+{% block content%}
+    <h3>Liste des équipements</h3>
+    <table>
+        <tr><th>Nom</th><th>Groupe</th><th>Sous-groupe</th><th>Prix unitaire</th><th>Unité</th><th>Actions</th></tr>
+    {% for e in equipements %}
+        <tr><td>{{ e.nom }}</td><td>{{ e.groupe.nom }}</td><td>{{ e.sous_groupe.nom }}</td><td>{{ e.prix }}</td><td>{{ e.unite }}</td>
+        <td><a href="{% url 'equipement_show' e.pk %}">Show</a> | <a href="{% url 'equipement_edit' e.pk %}">Edit</a> | <a href="{% url 'equipement_delete' e.pk %}">Delete</a></td></tr>
+    {% endfor %}
+    </table>
+{% endblock %}

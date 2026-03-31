@@ -1,20 +1,13 @@
-
 from django import forms
-from .models import Article
-from systeme.models import Systeme
+from article.models import Article
 
 
+class ArticleForm(forms.Form):
+    equipement_id = forms.IntegerField(widget=forms.HiddenInput)
+    nom = forms.CharField(disabled=True)
+    groupe = forms.CharField(disabled=True)
+    sous_groupe = forms.CharField(disabled=True)
+    prix = forms.DecimalField(disabled=True)
 
-class ArticleForm(forms.ModelForm):
-    class Meta:
-        model = Article
-        fields = ['nom', 'groupe', 'sous_groupe', 'prix', 'unite', 'qte']
-        widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'groupe': forms.TextInput(attrs={'class': 'form-control'}),
-            'sous_groupe': forms.TextInput(attrs={'class': 'form-control'}),
-            'prix': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'unite': forms.TextInput(attrs={'class': 'form-control'}),
-            'qte': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
-
+    qte = forms.DecimalField(required=False)
+    ajouter = forms.BooleanField(required=False)

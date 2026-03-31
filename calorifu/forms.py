@@ -8,7 +8,7 @@ class CalorifuForm(forms.ModelForm):
             'tuy', 'tuy_cds', 'tuy_emb', 'tuy_rob',
             'isol_cds', 'isol_emb', 'isol_rob',
             'antifeu_cds', 'antifeu_emb', 'antifeu_rob',
-            'article'
+            'systeme','article'
         ]
         labels = {
             'tuy': 'Mètres (m) Tuyaux',
@@ -21,10 +21,12 @@ class CalorifuForm(forms.ModelForm):
             'antifeu_cds': 'CDS Anti-Feu',
             'antifeu_emb': 'Embouts Anti-Feu',
             'antifeu_rob': 'Robinetterie Anti-Feu',
+            'systeme':'Systeme',
             'article': 'Article',
         }
         widgets = {
             'tuy': forms.NumberInput(attrs={'step': '0.01'}),
+            'systeme': forms.Select(attrs={'class': 'form-control'}),
             'article': forms.Select(attrs={'class': 'form-control'}),
         }
 

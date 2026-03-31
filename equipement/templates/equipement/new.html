@@ -1,0 +1,63 @@
+her les équipements avec checkbox + champ qte pour créer les articles en même temps que le système. Voici un exemple complet et fonctionnel :
+
+{% extends 'base.html' %}
+
+{% block sidebar %}
+<h3>Menu Système</h3>
+<p><a href="{% url 'home' %}">Accueil</a></p>
+<p><a href="{% url 'systeme_list' %}">Liste des systèmes</a></p>
+{% endblock sidebar %}
+
+{% block content %}
+<h2>Créer un système</h2>
+
+<form method="get" class="mb-3">
+    {# Étape 1 : choisir le type de système #}
+    <label for="id_type">Sélectionner le type de système :</label>
+    <select name="type" id="id_type" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Choisir --</option>
+        {% for t in form.fields.type.queryset %}
+            <option value="{{ t.id }}" {% if form.initial.type and form.initial.type.id == t.id %}selected{% endif %}>
+                {{ t.nom }} ({{ t.abreviation }}) - {{ t.get_prodouemis_display }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    {% if articles_forms %}
+        <h3>Articles à ajouter</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Ajouter</th>
+                    <th>Nom</th>
+                    <th>Groupe</th>
+                    <th>Sous-groupe</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in articles_forms %}
+                <tr>
+                    <td>{{ f.ajouter }}</td>
+                    <td>{{ f.nom }}</td>
+                    <td>{{ f.groupe }}</td>
+                    <td>{{ f.sous_groupe }}</td>
+                    <td>{{ f.qte }}</td>
+                    <td>{{ f.prix }}</td>
+                    {{ f.equipement_id }}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Créer le système</button>
+    <a href="{% url 'systeme_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock content %}

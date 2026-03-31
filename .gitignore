@@ -1,0 +1,44 @@
+./19224_Soumision.xlsx
+db.sqlite3
+db (Copie).sqlite3
+token_Soumchif.txt
+DIVERS/
+# ----------------------------
+# Fichiers temporaires
+# ----------------------------
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ----------------------------
+# Dossiers de build / distribution
+# ----------------------------
+build/
+dist/
+out/
+target/
+
+# ----------------------------
+# Environnements / secrets
+# ----------------------------
+.env
+*.key
+*.pem
+*.p12
+
+# ----------------------------
+# IDE / éditeurs
+# ----------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ----------------------------
+# Système
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+

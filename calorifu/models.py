@@ -1,5 +1,6 @@
 from django.db import models
 
+from systeme.models import Systeme
 from article.models import Article
 
 class Calorifu(models.Model):
@@ -14,7 +15,8 @@ class Calorifu(models.Model):
     antifeu_cds = models.PositiveIntegerField(default=0)
     antifeu_emb = models.PositiveIntegerField(default=0)
     antifeu_rob = models.PositiveIntegerField(default=0)
-    article=models.ForeignKey(Article, on_delete=models.CASCADE, related_name='article')
+    systeme=models.ForeignKey(Systeme,default='', on_delete=models.CASCADE, related_name='systeme_calorifus')
+    article=models.ForeignKey(Article, on_delete=models.CASCADE, related_name='calorifus')
 
     def __str__(self):
         return f"{self.article.nom} {self.tuy} (m)"

@@ -1,54 +1,58 @@
-{% extends 'base.html' %}
-
-{% block sidebar %}
-<h3>Menu Système</h3>
-<p><a href="{% url 'home' %}">Accueil</a></p>
-<p><a href="{% url 'systeme_list' %}">Liste des systèmes</a></p>
-{% endblock sidebar %}
-
-
-
-{% block content %}
-<h2>Créer un système</h2>
-
 <form method="post">
     {% csrf_token %}
-    {{ form }}
+    
+    {{ form.nom.label }} {{ form.nom }}
+    {{ form.abreviation.label }} {{ form.abreviation }}
+    {{ form.type.label }} {{ form.type }}
+    {{ form.local.label }} {{ form.local }}
+    {{ form.projet.label }} {{ form.projet }}
 
-    <h3>Articles à attribuer</h3>
-    <table class="table table-bordered">
+    <h3>Équipements</h3>
+
+    <table class="table" id="equipements-table">
         <thead>
             <tr>
                 <th>Ajouter</th>
                 <th>Nom</th>
                 <th>Groupe</th>
                 <th>Sous-groupe</th>
-                <th>Quantité</th>
+                <th>Qté</th>
                 <th>Prix</th>
             </tr>
         </thead>
         <tbody>
-            {{ formset.management_form }}
-            {% for f in formset %}
-            print(f.cleaned_data)
-            <tr>
-                {{ f.id }}  <!-- 🔥 CRUCIAL -->
-                <td>{{ f.ajouter }}</td>
-                <td>{{ f.instance.nom }}</td>
-                <td>{{ f.instance.groupe }}</td>
-                <td>{{ f.instance.sous_groupe }}</td>
-                <td>{{ f.qte }}</td>
-                <td>{{ f.prix }}</td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
 
-        print("FORM ERRORS:", form.errors)
-print("FORMSET ERRORS:", formset.errors)
-    print("VALID FORMSET ?", formset.is_valid())
-
-    <button type="submit" class="btn btn-primary">Créer</button>
-    <a href="{% url 'systeme_list' %}" class="btn btn-secondary">Annuler</a>
+    <button type="submit">Créer</button>
 </form>
-{% endblock content %}
+
+<script>
+document.getElementById('id_type').addEventListener('change', function() {
+    let typeId = this.value;
+
+    fetch(`/ajax/equipements/?type_id=${typeId}`)
+        .then(response => response.json())
+        .then(data => {
+            let tbody = document.querySelector('#equipements-table tbody');
+            tbody.innerHTML = '';
+
+            data.equipements.forEach((e, index) => {
+                let row = `
+                    <tr>
+                        <td><input type="checkbox" name="add-${index}-ajouter"></td>
+                        <td>${e.nom}</td>
+                        <td>${e.groupe}</td>
+                        <td>${e.sous_groupe}</td>
+                        <td>
+                            <input type="number" step="0.01" name="add-${index}-qte" class="form-control">
+                        </td>
+                        <td>${e.prix}</td>
+                        <input type="hidden" name="add-${index}-equipement_id" value="${e.id}">
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        });
+});
+</script>

@@ -6,12 +6,53 @@
 <form method="post">
     {% csrf_token %}
 
-    {{ form.as_p }}
+    <!-- Formulaire principal -->
+    <div class="mb-3">
+        {{ form.nom.label_tag }} {{ form.nom }}
+    </div>
+    <div class="mb-3">
+        {{ form.abreviation.label_tag }} {{ form.abreviation }}
+    </div>
+    <div class="mb-3">
+        {{ form.type.label_tag }} {{ form.type }}
+    </div>
+    <div class="mb-3">
+        {{ form.local.label_tag }} {{ form.local }}
+    </div>
+    <div class="mb-3">
+        {{ form.projet.label_tag }} {{ form.projet }}
+    </div>
 
-    <h3>Articles</h3>
+    <!-- Articles existants -->
+    <h3>Articles existants</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Groupe</th>
+                <th>Sous-groupe</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+                <th>Unité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in articles_existants_forms %}
+            <tr>
+                <td>{{ f.nom }}</td>
+                <td>{{ f.groupe }}</td>
+                <td>{{ f.sous_groupe }}</td>
+                <td>{{ f.qte }}</td>
+                <td>{{ f.prix }}</td>
+                <td>{{ f.unite }}</td>
+                {{ f.equipement_id }}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-    {{ formset.management_form }}
-
+    <!-- Nouveaux équipements à ajouter -->
+    <h3>Nouveaux équipements</h3>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -21,23 +62,20 @@
                 <th>Sous-groupe</th>
                 <th>Quantité</th>
                 <th>Prix</th>
+                <th>Unité</th>
             </tr>
         </thead>
         <tbody>
-            {% for f in formset %}
+            {% for f in articles_nouveaux_forms %}
             <tr>
-                {{ f.id }}  <!-- 🔥 obligatoire -->
-
                 <td>{{ f.ajouter }}</td>
-                <td>{{ f.instance.nom }}</td>
-                <td>{{ f.instance.groupe }}</td>
-                <td>{{ f.instance.sous_groupe }}</td>
+                <td>{{ f.nom }}</td>
+                <td>{{ f.groupe }}</td>
+                <td>{{ f.sous_groupe }}</td>
                 <td>{{ f.qte }}</td>
                 <td>{{ f.prix }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">Aucun article disponible</td>
+                <td>{{ f.unite }}</td>
+                {{ f.equipement_id }}
             </tr>
             {% endfor %}
         </tbody>
@@ -46,5 +84,4 @@
     <button type="submit" class="btn btn-primary">Enregistrer</button>
     <a href="{% url 'systeme_list' %}" class="btn btn-secondary">Annuler</a>
 </form>
-
 {% endblock %}

@@ -10,4 +10,5 @@ urlpatterns = [
     path('systeme/<int:pk>/show', systeme.views.show, name='systeme_show'),
     path('systeme/<int:pk>/edit', systeme.views.edit, name='systeme_edit'),
     path('systeme/<int:pk>/delete', systeme.views.delete, name='systeme_delete'),
+    path('ajax/equipements/', systeme.views.get_equipements, name='ajax_equipements'),
 ]

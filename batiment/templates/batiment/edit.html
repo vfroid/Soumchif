@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h3> Modifier le bâtiment: {{ batiment.nom }}</h3>
+    <h3> Modifier le bâtiment: {{ equipement.nom }}</h3>
 
     <form method="post">
         {% csrf_token %}
@@ -9,6 +9,6 @@
         <button type="submit">Enregistrer</button>
     </form>
 
-<a href="{% url 'batiment_list' %}">Annuler</a>
+<a href="{% url 'equipement_list' %}">Annuler</a>
 
 {% endblock %}

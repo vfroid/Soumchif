@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include('projet.urls')),
     path('', include('batiment.urls')),
     path('', include('systeme.urls')),
+    path('', include('equipement.urls')),
     path('', include('article.urls')),
     path('', include('calorifu.urls')),
 ]

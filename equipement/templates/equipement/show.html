@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block sidebar %}
+    <h3>Menu Batiment</h3>
+    <p><a href="{% url 'home' %}">Accueil</a></p>
+    <p><a href="{% url 'equipement_list' %}">Equipements</a></p>
+{% endblock sidebar %}
+
+
+{% block content%}
+    <h3>{{ equipement.nom}}</h3>
+    <p>Groupe : {{ equipement.groupe}} , sous-groupe : {{ equipement.sous_groupe}} , prix : {{ equipement.prix}} , unité :{{ equipement.unite}}</p>
+{% endblock %}

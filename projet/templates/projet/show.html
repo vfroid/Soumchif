@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h3> Projet : {{ projet.designation }} </h3>
+    <h3> Projet : {{ projet.description }} </h3>
     <p> Mandant: {{ projet.mandant }}</p>
 
     <h3> Regroupement par systèmes</h3>
@@ -39,23 +39,48 @@
     </table>
 
    <h3> Regroupement par articles</h3>
-<table>
-    <tr>
-        <th>Article</th>
-        <th>Quantité</th>
-        <th>Montant</th>
-    </tr>
+    <table>
+        <tr>
+            <th>Article</th>
+            <th>Quantité</th>
+            <th>Montant</th>
+        </tr>
 
-    {% for a in articles_groupes %}
+        {% for a in articles_groupes %}
+            <tr>
+                <td>{{ a.nom }}</td>
+                <td>{{ a.total_qte }}</td>
+                <td>{{ a.total_montant|floatformat:2 }} CHF</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">Aucun article</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Calorifugeages</h3>
+    <table>
         <tr>
-            <td>{{ a.nom }}</td>
-            <td>{{ a.total_qte }}</td>
-            <td>{{ a.total_montant|floatformat:2 }} CHF</td>
+            <th>Article</th>
+            <th>Longueur (m)</th>
+            <th>Tuy_CDS</th>
+            <th>Tuy_Emb</th>
+            <th>Tuy_Rob</th>
         </tr>
-    {% empty %}
-        <tr>
-            <td colspan="3">Aucun article</td>
-        </tr>
-    {% endfor %}
-</table>
+
+        {% for c in calorifus %}
+            <tr>
+                <td>{{ c.nom }}</td>
+                <td>{{ c.total_tuy| floatformat:2 }}</td>
+                <td>{{ c.total_tuy_cds  }}</td>
+                <td>{{ c.total_tuy_emb  }}</td>
+                <td>{{ c.total_tuy_rob }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">Aucun calorifugeage</td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock content %}

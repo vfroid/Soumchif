@@ -1,7 +1,44 @@
+# systeme/views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from systeme.models import Systeme
+from systeme.models import SystemeType, Systeme
+from equipement.models import Equipement
 from article.models import Article
-from systeme.forms import SystemeForm, ArticleSystemeFormSet
+from .forms import SystemeForm
+from article.forms import ArticleForm
+from django.forms import modelformset_factory
+
+from .forms import (
+    SystemeForm,
+    ArticleAjoutForm,
+    ArticleEditForm,
+    ArticleSystemeFormSet,
+)
+
+from django.http import JsonResponse
+
+
+def get_equipements(request):
+    type_id = request.GET.get('type_id')
+    data = []
+
+    if type_id:
+        try:
+            type_obj = SystemeType.objects.get(pk=type_id)
+            equipements = type_obj.equipements_lies.all()
+
+            for e in equipements:
+                data.append({
+                    'id': e.id,
+                    'nom': e.nom,
+                    'groupe': e.groupe.nom,
+                    'sous_groupe': e.sous_groupe.nom,
+                    'unite': e.unite,
+                    'prix': float(e.prix),
+                })
+        except SystemeType.DoesNotExist:
+            pass
+
+    return JsonResponse({'equipements': data})
 
 
 
@@ -29,111 +66,118 @@ def show(request, pk):
 
 
 def new(request):
-    if request.method == "POST":
-        form = SystemeForm(request.POST)
+    form = SystemeForm(request.POST or None)
 
-        # ⚠️ récupérer le type AVANT validation
-        type_id = request.POST.get('type')
+    if request.method == 'POST' and form.is_valid():
+        systeme = form.save()
 
-        if type_id:
-            articles_qs = Article.objects.filter(systeme_types__id=type_id).distinct()
-        else:
-            articles_qs = Article.objects.none()
+        i = 0
+        while True:
+            prefix = f'add-{i}-'
+            if prefix + 'equipement_id' not in request.POST:
+                break
 
-        formset = ArticleSystemeFormSet(request.POST, queryset=articles_qs)
+            ajouter = request.POST.get(prefix + 'ajouter')
+            equipement_id = request.POST.get(prefix + 'equipement_id')
+            qte = request.POST.get(prefix + 'qte') or 0
 
-        if form.is_valid() and formset.is_valid():
-            systeme = form.save()
+            if ajouter:
+                Article.objects.create(
+                    systeme=systeme,
+                    equipement_id=equipement_id,
+                    qte=qte
+                )
 
-            systeme.articles.clear()
+            i += 1
 
-            for f in formset:
-                if f.cleaned_data.get('ajouter'):
-                    article = f.instance
-                    article.qte = f.cleaned_data.get('qte', 0)
-                    article.prix = f.cleaned_data.get('prix', 0)
-                    article.save()
-                    systeme.articles.add(article)
+        return redirect('systeme_list')
 
-            print(formset.errors)
-            print([f.cleaned_data for f in formset])
-            return redirect('systeme_list')
-
-    else:
-        form = SystemeForm()
-        # 👉 afficher tous les articles au départ (plus simple)
-        articles_qs = Article.objects.all()
-
-        formset = ArticleSystemeFormSet(queryset=articles_qs)
-
-    return render(request, "systeme/new.html", {
-        "form": form,
-        "formset": formset
+    return render(request, 'systeme/new.html', {
+        'form': form
     })
-
 
 
 def edit(request, pk):
     systeme = get_object_or_404(Systeme, pk=pk)
+    form = SystemeForm(request.POST or None, instance=systeme)
 
-    if request.method == "POST":
-        form = SystemeForm(request.POST, instance=systeme)
+    # 🔹 ARTICLES EXISTANTS
+    articles_existants = Article.objects.filter(systeme=systeme)
+    articles_existants_forms = []
 
-        type_id = request.POST.get('type')
-
-        if type_id:
-            articles_qs = Article.objects.filter(systeme_types__id=type_id).distinct()
-        else:
-            articles_qs = Article.objects.none()
-
-        formset = ArticleSystemeFormSet(request.POST, queryset=articles_qs)
-
-        if form.is_valid() and formset.is_valid():
-            systeme = form.save()
-
-            systeme.articles.clear()
-
-            for f in formset:
-                if f.cleaned_data.get('ajouter'):
-                    article = f.instance
-                    article.qte = f.cleaned_data.get('qte', 0)
-                    article.prix = f.cleaned_data.get('prix', 0)
-                    article.save()
-                    systeme.articles.add(article)
-
-            return redirect('systeme_list')
-
-        print("FORM ERRORS:", form.errors)
-        print("FORMSET ERRORS:", formset.errors)
-
-    else:
-        form = SystemeForm(instance=systeme)
-
-        # Articles du type + déjà liés
-        articles_qs = (
-            Article.objects.filter(systeme_types=systeme.type) |
-            systeme.articles.all()
-        ).distinct()
-
-        # Pré-remplissage
-        initial_data = []
-        for art in articles_qs:
-            initial_data.append({
-                'qte': art.qte,
-                'prix': art.prix,
-                'ajouter': art in systeme.articles.all()
-            })
-
-        formset = ArticleSystemeFormSet(
-            queryset=articles_qs,
-            initial=initial_data
+    # Construire un formulaire pour chaque article existant
+    for i, art in enumerate(articles_existants):
+        articles_existants_forms.append(
+            ArticleAjoutForm(
+                request.POST if request.method == 'POST' else None,
+                prefix=f'exist-{i}',
+                initial={
+                    'equipement_id': art.equipement.id,
+                    'nom': art.equipement.nom,
+                    'groupe': art.equipement.groupe.nom,
+                    'sous_groupe': art.equipement.sous_groupe.nom,
+                    'unite': art.equipement.unite,
+                    'prix': art.equipement.prix,
+                    'qte': art.qte,
+                    'ajouter': True,
+                }
+            )
         )
 
-    return render(request, "systeme/edit.html", {
-        "form": form,
-        "formset": formset,
-        "systeme": systeme
+    # 🔹 NOUVEAUX EQUIPEMENTS
+    equipements_nouveaux = systeme.type.equipements_lies.exclude(
+        id__in=[a.equipement.id for a in articles_existants]
+    )
+    articles_nouveaux_forms = []
+    for i, e in enumerate(equipements_nouveaux):
+        articles_nouveaux_forms.append(
+            ArticleAjoutForm(
+                request.POST if request.method == 'POST' else None,
+                prefix=f'new-{i}',
+                initial={
+                    'equipement_id': e.id,
+                    'nom': e.nom,
+                    'groupe': e.groupe.nom,
+                    'sous_groupe': e.sous_groupe.nom,
+                    'unite': e.unite,
+                    'prix': e.prix,
+                    'qte': 0,
+                    'ajouter': False
+                }
+            )
+        )
+
+    # 🔹 POST : sauvegarde
+    if request.method == 'POST' and form.is_valid():
+        systeme = form.save()
+
+        # Articles existants : mise à jour des qte
+        for f in articles_existants_forms:
+            if f.is_valid():
+                equipement_id = f.cleaned_data['equipement_id']
+                qte = f.cleaned_data.get('qte') or 0
+                article = Article.objects.get(systeme=systeme, equipement_id=equipement_id)
+                article.qte = qte
+                article.save()
+
+        # Nouveaux articles : création si checkbox cochée
+        for f in articles_nouveaux_forms:
+            if f.is_valid() and f.cleaned_data.get('ajouter'):
+                equipement_id = f.cleaned_data['equipement_id']
+                qte = f.cleaned_data.get('qte') or 0
+                # éviter doublon
+                if not Article.objects.filter(systeme=systeme, equipement_id=equipement_id).exists():
+                    Article.objects.create(systeme=systeme, equipement_id=equipement_id, qte=qte)
+
+        return redirect('systeme_list')
+
+    return render(request, 'systeme/edit.html', {
+        'form': form,
+        'articles_existants_forms': articles_existants_forms,
+        'articles_nouveaux_forms': articles_nouveaux_forms,
+        'systeme': systeme,
     })
+
 
 def delete(request, pk):
     systeme = get_object_or_404(Systeme, pk=pk)

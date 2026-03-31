@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3> Modifier l'équipement': {{ equipement.nom }}</h3>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Modifier</button>
+    </form>
+
+<a href="{% url 'batiment_list' %}">Annuler</a>
+
+{% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Article
 from .forms import ArticleForm
 from systeme.models import Systeme
-from systeme.forms import ArticleSystemeForm
+from systeme.forms import ArticleSystemeFormSet
 
 def attribuer_systemes(request, article_id):
     article = get_object_or_404(Article, pk=article_id)
