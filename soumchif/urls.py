@@ -33,7 +33,7 @@ urlpatterns = [
     path('', include('systeme.urls')),
     path('', include('equipement.urls')),
     path('', include('article.urls')),
-    path('', include('calorifu.urls')),
+    path('calorifu/', include('calorifu.urls', namespace='calorifu'))
 ]
 
 if settings.DEBUG:

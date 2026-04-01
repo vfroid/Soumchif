@@ -3,13 +3,13 @@
 {% block sidebar %}
     <h3>Menu Calorifu</h3>
     <p><a href="{% url 'home' %}">Accueil</a></p>
-    <p><a href="{% url 'calorifu_list' %}">Liste des calorifugeages</a></p>
+    <p><a href="{% url 'calorifu:calorifu_list' %}">Liste des calorifugeages</a></p>
 {% endblock sidebar %}
 
 {% block content %}
-    <h1>Calorifugeage de {{ calorifu.article.nom }}</h1>
+    <h1>Calorifugeage de {{ calorifu.article.equipement.nom }}</h1>
 
-    <h3> Article : {{ calorifu.nom }}</h3>
+    <h3> Article : {{ calorifu.article.equipement.nom }}</h3>
     <p>Longueur : {{ calorifu.tuy }} m</p>
     <p>Coudes: {{ calorifu.tuy_cds }} </p>
     <p>Embouts: {{ calorifu.tuy_emb }} </p>
@@ -24,7 +24,7 @@
     <p>Robinets : {{ calorifu.antifeu_rob }} </p>
 
     <div>
-        <a href="{% url 'calorifu_edit' calorifu.pk %}" class="button">Modifier</a>
-        <a href="{% url 'calorifu_list' %}" class="button">Annuler</a>
+        <a href="{% url 'calorifu:calorifu_edit' calorifu.pk %}" class="button">Modifier</a>
+        <a href="{% url 'calorifu:calorifu_list' %}" class="button">Annuler</a>
     </div>
 {% endblock content %}

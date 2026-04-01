@@ -2,7 +2,6 @@
 
 {% block sidebar %}
     <p><a href="{% url 'home' %}">Accueil</a></p>
-    <p><a href="{% url 'calorifu_new' %}">Nouveau Calorifu</a></p>
 {% endblock sidebar %}
 
 
@@ -10,19 +9,21 @@
     <h1>Liste des calorifugeages</h1>
         <table>
             <tr>
-                <th>Article</th><th>Tuy</th><th>Cds</th><th>Emb</th><th>Rob</th>
+                <th>Projet</th><th>Systeme</th><th>Article</th><th>Tuy</th><th>Cds</th><th>Emb</th><th>Rob</th>
                 <th>Isol-Cds</th><th>Isol-Emb</th><th>Isol-Rob</th>
                 <th>Antifeu-Cds</th><th>Antifeu-Emb</th><th>Antifeu-Rob</th><th>Actions</th>
             </tr>
             {% for c in calorifus %}
             <tr>
-                <td>{{ c.article.nom }}</td><td>{{  c.tuy  }}</td> <td>{{  c.tuy_cds  }}</td> <td>{{  c.tuy_emb  }}</td> <td>{{  c.tuy_rob  }}</td>
+                <td>{{ c.article.systeme.projet.description }}</td>
+                <td>{{ c.article.systeme.nom }}</td>
+                <td>{{ c.article.equipement.nom }}</td><td>{{  c.tuy  }}</td> <td>{{  c.tuy_cds  }}</td> <td>{{  c.tuy_emb  }}</td> <td>{{  c.tuy_rob  }}</td>
                 <td>{{  c.isol_cds  }}</td> <td>{{  c.isol_emb  }}</td> <td>{{  c.isol_rob  }}</td>
                 <td>{{  c.antifeu_cds  }}</td> <td>{{  c.antifeu_emb  }}</td> <td>{{  c.antifeu_rob  }}</td>
             <td>
-                <a href="{% url 'calorifu_show' c.pk%}">Show</a> |
-                <a href="{% url 'calorifu_edit' c.pk %}">Edit</a>
-                <a href="{% url 'calorifu_delete' c.pk %}">Delete</a>
+                <a href="{% url 'calorifu:calorifu_show' c.pk%}">Show</a> |
+                <a href="{% url 'calorifu:calorifu_edit' c.pk %}">Edit</a>
+                <a href="{% url 'calorifu:calorifu_delete' c.pk %}">Delete</a>
             </td>
             </tr>
             {% endfor %}

@@ -1,17 +1,133 @@
 {% extends 'base.html' %}
 
-{% block sidebar %}
-    <h3>Menu Calorifu</h3>
-    <p><a href="{% url 'home' %}">Accueil</a></p>
-{% endblock sidebar %}
-
 {% block content %}
-    <h1> Créer un calorifugeage</h1>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-        <button type="submit">Créer</button>
-            <a href="{% url 'calorifu_list' %}" class="button">Annuler</a>
-    </form>
+<h2>Ajouter un nouveau Calorifu pour le projet : {{ projet.mandant }}</h2>
 
-{% endblock content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- Système -->
+    <div class="mb-3">
+        <label for="id_systeme" class="form-label">Système</label>
+        <select name="systeme" id="id_systeme" class="form-select" required>
+            <option value="" disabled selected>-- Choisir un système --</option>
+            {% for systeme in form.fields.systeme.queryset %}
+                <option value="{{ systeme.id }}"
+                    {% if form.initial.systeme == systeme.id %}selected{% endif %}>
+                    {{ systeme.nom }}
+                </option>
+            {% endfor %}
+        </select>
+        {% if form.systeme.errors %}
+            <div class="text-danger">{{ form.systeme.errors }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Article -->
+    <div class="mb-3">
+        <label for="id_article" class="form-label">Article (tuyau)</label>
+        <select name="article" id="id_article" class="form-select" required>
+            <option value="" disabled selected>-- Choisir un article --</option>
+            {% comment %} Les options seront remplies dynamiquement via JS {% endcomment %}
+        </select>
+        {% if form.article.errors %}
+            <div class="text-danger">{{ form.article.errors }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Tuy -->
+    <div class="mb-3">
+        <label for="id_tuy" class="form-label">Longueur tuyau (m)</label>
+        <input type="number" name="tuy" id="id_tuy" class="form-control"
+               value="{{ form.tuy.value|default_if_none:'' }}" step="0.01" required>
+        {% if form.tuy.errors %}
+            <div class="text-danger">{{ form.tuy.errors }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Autres champs de Calorifu -->
+    <div class="mb-3 row">
+        <div class="col">
+            <label class="form-label">Tuy cds</label>
+            <input type="number" name="tuy_cds" class="form-control"
+                   value="{{ form.tuy_cds.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Tuy emb</label>
+            <input type="number" name="tuy_emb" class="form-control"
+                   value="{{ form.tuy_emb.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Tuy rob</label>
+            <input type="number" name="tuy_rob" class="form-control"
+                   value="{{ form.tuy_rob.value|default_if_none:0 }}">
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <div class="col">
+            <label class="form-label">Isol cds</label>
+            <input type="number" name="isol_cds" class="form-control"
+                   value="{{ form.isol_cds.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Isol emb</label>
+            <input type="number" name="isol_emb" class="form-control"
+                   value="{{ form.isol_emb.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Isol rob</label>
+            <input type="number" name="isol_rob" class="form-control"
+                   value="{{ form.isol_rob.value|default_if_none:0 }}">
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <div class="col">
+            <label class="form-label">Antifeu cds</label>
+            <input type="number" name="antifeu_cds" class="form-control"
+                   value="{{ form.antifeu_cds.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Antifeu emb</label>
+            <input type="number" name="antifeu_emb" class="form-control"
+                   value="{{ form.antifeu_emb.value|default_if_none:0 }}">
+        </div>
+        <div class="col">
+            <label class="form-label">Antifeu rob</label>
+            <input type="number" name="antifeu_rob" class="form-control"
+                   value="{{ form.antifeu_rob.value|default_if_none:0 }}">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+</form>
+
+<!-- Script pour charger dynamiquement les articles selon le système choisi -->
+<script>
+const articleUrlTemplate = "{% url 'calorifu:articles_par_systeme' 0 %}";
+
+document.getElementById("id_systeme").addEventListener("change", function() {
+    const systemeId = this.value;
+    const articleSelect = document.getElementById("id_article");
+
+    // vider l'ancien contenu
+    articleSelect.innerHTML = "";
+
+    // remplacer 0 par l'id du système
+    const url = articleUrlTemplate.replace("0", systemeId);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(a => {
+                const option = document.createElement("option");
+                option.value = a.id;
+                option.text = `${a.equipement_nom} (${a.qte})`;
+                articleSelect.appendChild(option);
+            });
+        })
+        .catch(err => console.error("Erreur fetch articles:", err));
+});
+</script>
+{% endblock %}

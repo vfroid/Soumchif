@@ -1,20 +1,48 @@
 {% extends 'base.html' %}
 
-
-{% block sidebar %}
-    <h3>Menu Calorifu</h3>
-    <p><a href="{% url 'home' %}">Accueil</a></p>
-    <p><a href="{% url 'calorifu_list' %}">Liste des calorifugeages</a></p>
-{% endblock sidebar %}
-
 {% block content %}
-    <h1>Modifier le calorifugeage de {{ calorifu.article.nom }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div>
-            <button type="submit">Modifier</button>
-            <a href="{% url 'calorifu_list' %}" class="button">Annuler</a>
-        </div>
-    </form>
-{% endblock content %}
+<h2>Modifier Calorifugeage</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Affichage en texte du système et de l'article -->
+    <p><strong>Système :</strong> {{ calorifu.systeme.nom }}</p>
+    <p><strong>Article :</strong> {{ calorifu.article.equipement.nom }}</p>
+
+    <!-- Champs modifiables -->
+    <div>
+        {{ form.tuy.label_tag }} {{ form.tuy }}
+    </div>
+    <div>
+        {{ form.tuy_cds.label_tag }} {{ form.tuy_cds }}
+    </div>
+    <div>
+        {{ form.tuy_emb.label_tag }} {{ form.tuy_emb }}
+    </div>
+    <div>
+        {{ form.tuy_rob.label_tag }} {{ form.tuy_rob }}
+    </div>
+    <div>
+        {{ form.isol_cds.label_tag }} {{ form.isol_cds }}
+    </div>
+    <div>
+        {{ form.isol_emb.label_tag }} {{ form.isol_emb }}
+    </div>
+    <div>
+        {{ form.isol_rob.label_tag }} {{ form.isol_rob }}
+    </div>
+    <div>
+        {{ form.antifeu_cds.label_tag }} {{ form.antifeu_cds }}
+    </div>
+    <div>
+        {{ form.antifeu_emb.label_tag }} {{ form.antifeu_emb }}
+    </div>
+    <div>
+        {{ form.antifeu_rob.label_tag }} {{ form.antifeu_rob }}
+    </div>
+
+    <button type="submit">Enregistrer</button>
+    <a href="{% url 'calorifu:calorifu_list' %}">Annuler</a>
+</form>
+{% endblock %}
